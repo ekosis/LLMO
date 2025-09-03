@@ -2,7 +2,9 @@
 Writes a small HTML file into data/raw/ so later steps can operate."""
 from pathlib import Path
 
-SAMPLE_HTML = """
+TARGET_URL = "https://github.com/Kuzma02/Electronics-eCommerce-Shop-With-Admin-Dashboard-NextJS-NodeJS"  # Singitronic.com
+
+SAMPLE_HTML = f"""
 <html>
   <body>
     <h1>Sample Shop</h1>
@@ -14,7 +16,7 @@ SAMPLE_HTML = """
       <p>We will be closed on holidays.</p>
     </div>
     <div class="contact">
-      <p>Contact us at info@example.com</p>
+      <p>Source: {TARGET_URL}</p>
     </div>
   </body>
 </html>
