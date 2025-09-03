@@ -1,54 +1,48 @@
-# LLMO SaaS MVP (Singitronic target)
+# LLMO
 
-This is a minimal end-to-end MVP that:
-1) fetches UI sources from a GitHub repo (e.g., Singitronic Next.js shop),
-2) parses semantic units (items, FAQs, notices, docs),
-3) chunks & embeds them,
-4) builds a FAISS vector store,
-5) answers user questions via RAG with GPT-4o (with citations).
+LLMO는 GitHub 저장소의 웹/앱 소스를 수집하여 RAG(Retrieval-Augmented Generation) 파이프라인을 구축하는 최소 예시 프로젝트입니다. 간단한 HTML 샘플이나 실제 사이트를 대상으로 다음 과정을 거쳐 검색 API를 제공합니다.
 
-## Quick start
+## 특징
+- GitHub 또는 실제 웹 페이지에서 HTML 소스를 수집
+- 페이지 블록을 LLM/휴리스틱으로 분류
+- 분류된 블록에서 특징을 추출하고 청크 단위로 묶음
+- 임베딩을 생성하여 FAISS 인덱스를 구축
+- 임베딩 기반 검색 API 제공
+
+## 설치
 ```bash
-python -m venv .venv && source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
 pip install -r requirements.txt
+# OpenAI API 키 설정 (선택 사항)
 echo "OPENAI_API_KEY=YOUR_KEY" > .env
-
-python 0_main.py     # Or run each step individually below
-python 7_api.py      # Start FastAPI search API
 ```
 
-### Run steps individually
+## 빠른 실행
+모든 단계를 연속으로 실행하려면 제공된 스크립트를 사용합니다.
 ```bash
-python 1_fetch.py     # input: GitHub repo URL (default: Singitronic)
-python 2_parse.py     # outputs parsed JSONL files
-python 3_chunk_embed.py
-python 4_vector_store.py
-python 5_query.py     # interactive multi-turn Q&A; optionally save JSON
-python 7_api.py       # optional: start API server
+bash quickstart.sh
 ```
 
-## Notes
-- **Fetching**: For Next.js repos, rendered HTML is not present; we ingest UI source files as "webpage sources" for this MVP.
-- **Chunking**: Unit-aware (items as a single chunk, FAQ Q/A pairs, notices/docs chunked by paragraphs).
-- **Embeddings**: `text-embedding-3-small` by default (set `EMBEDDING_MODEL` env to change).
-- **Chat model**: `gpt-4o` by default (set `CHAT_MODEL` env to change).
-- **Index**: FAISS (cosine similarity via normalized vectors).
+## 단계별 실행
+각 단계를 개별적으로 실행할 수도 있습니다.
+```bash
+python 1_collect_source.py                      # 예시 HTML 생성
+python ingest/2_crawler.py <URL> --out data/raw # 실제 사이트 크롤링(옵션)
+python agents/3_page_classifier.py              # 페이지 블록 분류
+python agents/4_feature_extractor.py            # 특징 추출
+python agents/5_chunker.py                      # 청크 생성
+python agents/6_embedder.py                     # 임베딩 및 인덱스 저장
+# python 7_api.py                               # 간단한 검색 API 실행
+```
 
-## Folders
+## 디렉터리 구조
 ```
 data/
-  raw/          # sources.jsonl
-  parsed/       # items.jsonl, faqs.jsonl, notices.jsonl, docs.jsonl
-  chunks/       # chunks.jsonl
-  embeddings/   # embeddings.npy, meta.jsonl
-  index/        # faiss.index, index_meta.jsonl
-  answers/      # saved RAG answers
-workspace/      # git clone target
+  raw/          # 원본 HTML
+  parsed/       # 분류 결과 및 특징
+  chunks/       # 청크 데이터
+  index/        # 임베딩 및 메타 정보
 ```
 
-## Security
-- Only public repo sources are ingested in this MVP. Do not ingest secrets.
-- Use `.env` for API keys (never commit your keys).
-
-## License
-This sample is provided "as is" for MVP/demo purposes.
+## 라이선스
+이 프로젝트는 데모 목적의 예시 코드이며 "as is" 상태로 제공됩니다.
