@@ -14,6 +14,7 @@ pip install -r requirements.txt
 echo "OPENAI_API_KEY=YOUR_KEY" > .env
 
 python 0_main.py     # Or run each step individually below
+python 7_api.py      # Start FastAPI search API
 ```
 
 ### Run steps individually
@@ -23,6 +24,7 @@ python 2_parse.py     # outputs parsed JSONL files
 python 3_chunk_embed.py
 python 4_vector_store.py
 python 5_query.py     # interactive multi-turn Q&A; optionally save JSON
+python 7_api.py       # optional: start API server
 ```
 
 ## Notes
