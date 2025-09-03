@@ -1,0 +1,5 @@
+fields:
+  name: Product name
+  price: Price in USD
+  brand: Manufacturer brand
+  description: Short description
