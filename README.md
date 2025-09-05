@@ -25,14 +25,21 @@ pip install -r requirements.txt
 echo "OPENAI_API_KEY=YOUR_KEY" > .env
 ```
 
+## 환경 변수
+실행 시 다음 환경 변수를 사용할 수 있습니다.
+- `OPENAI_API_KEY` : OpenAI API 키(설정하지 않으면 해시 기반 임베딩 사용)
+- `CHAT_MODEL` : 페이지 분류에 사용할 모델 이름(기본값 `gpt-4o-mini`)
+- `EMBEDDING_MODEL` : 임베딩 생성에 사용할 모델 이름(기본값 `text-embedding-3-small`)
+- `PORT` : API 서버 포트(기본값 `8000`)
+
 ## 빠른 실행
 모든 단계를 연속으로 실행하려면 제공된 스크립트를 사용합니다.
 ```bash
 bash quickstart.sh
 ```
 
-## 단계별 실행
-각 단계를 개별적으로 실행할 수도 있습니다.
+## 실행 순서
+아래 명령을 순서대로 실행하여 파이프라인을 구축합니다.
 ```bash
 python 1_collect_source.py                      # 예시 HTML 생성
 python ingest/2_crawler.py <URL> --out data/raw # 실제 사이트 크롤링(옵션)
@@ -40,7 +47,7 @@ python agents/3_page_classifier.py              # 페이지 블록 분류
 python agents/4_feature_extractor.py            # 특징 추출
 python agents/5_chunker.py                      # 청크 생성
 python agents/6_embedder.py                     # 임베딩 및 인덱스 저장
-# python 7_api.py                               # 간단한 검색 API 실행
+python 7_api.py                                 # 간단한 검색 API 실행
 ```
 
 ## 디렉터리 구조
