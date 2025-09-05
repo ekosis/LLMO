@@ -2,12 +2,56 @@
 import json
 from pathlib import Path
 
-def chunk_features(input_path: Path, output_path: Path) -> None:
-    with input_path.open("r", encoding="utf-8") as infile, output_path.open("w", encoding="utf-8") as outfile:
-        for idx, line in enumerate(infile):
+try:
+    import tiktoken
+
+    _ENCODER = tiktoken.get_encoding("cl100k_base")
+except Exception:  # pragma: no cover - tiktoken may be unavailable
+    _ENCODER = None
+
+
+def _encode(text: str):
+    if _ENCODER is not None:
+        return _ENCODER.encode(text)
+    return text.split()
+
+
+def _decode(tokens) -> str:
+    if _ENCODER is not None:
+        return _ENCODER.decode(tokens)
+    return " ".join(tokens)
+
+
+def chunk_features(
+    input_path: Path,
+    output_path: Path,
+    max_tokens: int = 200,
+    overlap: int = 50,
+) -> None:
+    step = max_tokens - overlap if max_tokens > overlap else max_tokens
+    with input_path.open("r", encoding="utf-8") as infile, output_path.open(
+        "w", encoding="utf-8"
+    ) as outfile:
+        idx = 0
+        for line in infile:
             record = json.loads(line)
-            chunk = {"id": idx, "label": record.get("label", "other"), "text": record.get("text", "")}
-            outfile.write(json.dumps(chunk) + "\n")
+            text = record.get("text", "")
+            label = record.get("label", "other")
+            tokens = _encode(text)
+            if not tokens:
+                continue
+            for start in range(0, len(tokens), step):
+                end = min(start + max_tokens, len(tokens))
+                chunk_text = _decode(tokens[start:end])
+                chunk = {
+                    "id": idx,
+                    "label": label,
+                    "text": chunk_text,
+                    "token_start": start,
+                    "token_end": end,
+                }
+                outfile.write(json.dumps(chunk) + "\n")
+                idx += 1
 
 def main() -> None:
     input_path = Path("data/parsed/features.jsonl")
