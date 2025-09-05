@@ -6,7 +6,15 @@ def chunk_features(input_path: Path, output_path: Path) -> None:
     with input_path.open("r", encoding="utf-8") as infile, output_path.open("w", encoding="utf-8") as outfile:
         for idx, line in enumerate(infile):
             record = json.loads(line)
-            chunk = {"id": idx, "label": record.get("label", "other"), "text": record.get("text", "")}
+            chunk = {
+                "id": idx,
+                "label": record.get("label", "other"),
+                "text": record.get("text", ""),
+            }
+            # Preserve any structured metadata from feature extraction
+            for key in ["price", "product_name", "content_id"]:
+                if key in record:
+                    chunk[key] = record[key]
             outfile.write(json.dumps(chunk) + "\n")
 
 def main() -> None:

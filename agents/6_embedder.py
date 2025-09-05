@@ -33,7 +33,8 @@ def main() -> None:
         for line in infile:
             record = json.loads(line)
             texts.append(record.get("text", ""))
-            meta.append({"id": record.get("id"), "label": record.get("label")})
+            # Preserve all metadata except the text itself
+            meta.append({k: v for k, v in record.items() if k != "text"})
     try:
         client = OpenAI()
     except Exception:
