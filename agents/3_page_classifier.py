@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 
 PROMPT_TEMPLATE = (
     "You are a classifier that labels website blocks. "
-    "Classify the block below as one of: product, notice, contact, or other. "
+    "Classify the block below as one of: product, product_detail, category_list, review, "
+    "content_summary, notice, contact, or other. "
     "Return a JSON object with keys 'label' and 'confidence' (0-1).\n\n"
     "BLOCK:\n{block}\n"
 )
@@ -21,10 +22,16 @@ def heuristic_label(text: str) -> str:
     text = text.lower()
     if any(k in text for k in ["contact", "email", "phone", "address"]):
         return "contact"
-    if any(k in text for k in ["cart", "buy", "price", "add to cart"]):
-        return "product"
+    if any(k in text for k in ["cart", "buy", "price", "add to cart", "basket", "checkout"]):
+        return "product_detail"
+    if any(k in text for k in ["review", "rating", "stars", "testimonial", "feedback"]):
+        return "review"
+    if any(k in text for k in ["summary", "article", "blog", "news", "content"]):
+        return "content_summary"
     if any(k in text for k in ["notice", "policy", "terms", "legal"]):
         return "notice"
+    if any(k in text for k in ["category", "categories", "department", "shop by"]):
+        return "category_list"
     return "other"
 
 def classify_block(client: OpenAI | None, block: str) -> Dict[str, Any]:
