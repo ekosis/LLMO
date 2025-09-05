@@ -42,14 +42,17 @@ def embed_query(text: str) -> List[float]:
         return [b / 255 for b in extended]
 
 
-@app.get("/search")
-def search(
-    q: str = Query(..., description="Search query"),
-    k: int = Query(5, ge=1, description="Number of results"),
-    label: str | None = Query(None, description="Optional label filter"),
-) -> Any:
+def run_search(q: str, k: int = 5, label: str | None = None) -> Any:
+    """Execute a vector search over the embedded chunks.
+
+    This function is a pure-Python helper so the search step can be exercised
+    from scripts without going through the FastAPI layer.  The web endpoint
+    below simply delegates to this function.
+    """
+
     if collection is None or collection.count() == 0:
-        return JSONResponse({"error": "index not built"}, status_code=500)
+        return {"error": "index not built"}
+
     q_vec = embed_query(q)
     where = {"label": label} if label else None
     result = collection.query(
@@ -77,6 +80,18 @@ def search(
             }
         )
     return {"matches": matches}
+
+
+@app.get("/search")
+def search(
+    q: str = Query(..., description="Search query"),
+    k: int = Query(5, ge=1, description="Number of results"),
+    label: str | None = Query(None, description="Optional label filter"),
+) -> Any:
+    result = run_search(q, k, label)
+    if "error" in result:
+        return JSONResponse(result, status_code=500)
+    return result
 
 
 if __name__ == "__main__":
