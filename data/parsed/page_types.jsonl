@@ -1,8 +1,8 @@
+{"text": "Widget Deluxe Price: $19.99 Content ID: WDGT-001", "label": "product_detail", "confidence": 1.0}
 {"text": "Sample product block", "label": "product", "confidence": 1.0}
-{"text": "Sample product detail block", "label": "product_detail", "confidence": 1.0}
 {"text": "Sample category list", "label": "category_list", "confidence": 1.0}
 {"text": "Sample review block", "label": "review", "confidence": 1.0}
-{"text": "Sample content summary", "label": "content_summary", "confidence": 1.0}
+{"text": "Sample content summary ID: CNT-123", "label": "content_summary", "confidence": 1.0}
 {"text": "Sample notice", "label": "notice", "confidence": 1.0}
 {"text": "Sample contact info", "label": "contact", "confidence": 1.0}
 {"text": "Other text", "label": "other", "confidence": 1.0}
