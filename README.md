@@ -38,6 +38,11 @@ echo "OPENAI_API_KEY=YOUR_KEY" > .env
 bash quickstart.sh
 ```
 
+임베딩이 생성된 후 API가 실행되면 다음과 같이 간단한 검색을 시도해 볼 수 있습니다.
+```bash
+curl "http://localhost:8000/search?q=sample"
+```
+
 ## 실행 순서
 아래 명령을 순서대로 실행하여 파이프라인을 구축합니다.
 ```bash
