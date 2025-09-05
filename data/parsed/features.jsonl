@@ -1,0 +1,8 @@
+{"label": "product_detail", "text": "Widget Deluxe Price: $19.99 Content ID: WDGT-001", "token_count": 7, "product_name": "Widget Deluxe", "price": 19.99, "content_id": "WDGT-001"}
+{"label": "product", "text": "Sample product block", "token_count": 3, "product_name": "Sample product block", "price": null, "content_id": null}
+{"label": "category_list", "text": "Sample category list", "token_count": 3, "product_name": null, "price": null, "content_id": null}
+{"label": "review", "text": "Sample review block", "token_count": 3, "product_name": null, "price": null, "content_id": null}
+{"label": "content_summary", "text": "Sample content summary ID: CNT-123", "token_count": 5, "product_name": null, "price": null, "content_id": "CNT-123"}
+{"label": "notice", "text": "Sample notice", "token_count": 2, "product_name": null, "price": null, "content_id": null}
+{"label": "contact", "text": "Sample contact info", "token_count": 3, "product_name": null, "price": null, "content_id": null}
+{"label": "other", "text": "Other text", "token_count": 2, "product_name": null, "price": null, "content_id": null}
