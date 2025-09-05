@@ -1,2 +1,2 @@
-{"id": 0, "label": "sample", "text": "This is an example chunk.", "token_start": 0, "token_end": 6}
+{"id": 0, "label": "sample", "text": "This is an example chunk.", "token_start": 0, "token_end": 6, "product_name": "Example product", "price": 9.99, "content_id": "EX-001"}
 {"id": 1, "label": "sample", "text": "It shows token range metadata.", "token_start": 5, "token_end": 11}

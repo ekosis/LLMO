@@ -57,9 +57,26 @@ def search(
         n_results=k,
         where=where,
     )
-    matches = result.get("metadatas", [[]])[0]
+
+    metas = result.get("metadatas", [[]])[0]
+    docs = result.get("documents", [[]])[0]
     scores = result.get("distances", [[]])[0]
-    return {"matches": matches, "scores": scores}
+    matches = []
+    for md, doc, score in zip(metas, docs, scores):
+        matches.append(
+            {
+                "id": md.get("id"),
+                "label": md.get("label"),
+                "text": doc,
+                "token_start": md.get("token_start"),
+                "token_end": md.get("token_end"),
+                "product_name": md.get("product_name"),
+                "price": md.get("price"),
+                "content_id": md.get("content_id"),
+                "score": score,
+            }
+        )
+    return {"matches": matches}
 
 
 if __name__ == "__main__":

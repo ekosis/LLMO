@@ -37,6 +37,15 @@ def chunk_features(
             record = json.loads(line)
             text = record.get("text", "")
             label = record.get("label", "other")
+
+            # Capture product related fields if present so they can flow through to
+            # the final chunks and ultimately the vector store metadata.
+            product_fields = {
+                "product_name": record.get("product_name"),
+                "price": record.get("price"),
+                "content_id": record.get("content_id"),
+            }
+
             tokens = _encode(text)
             if not tokens:
                 continue
@@ -49,6 +58,7 @@ def chunk_features(
                     "text": chunk_text,
                     "token_start": start,
                     "token_end": end,
+                    **product_fields,
                 }
                 outfile.write(json.dumps(chunk) + "\n")
                 idx += 1
