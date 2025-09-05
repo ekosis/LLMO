@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from typing import List
 
-import numpy as np
+import chromadb
 from openai import OpenAI
 
 def embed_texts(texts: List[str], client: OpenAI | None) -> List[List[float]]:
@@ -22,28 +22,37 @@ def embed_texts(texts: List[str], client: OpenAI | None) -> List[List[float]]:
 
 def main() -> None:
     input_path = Path("data/chunks/chunks.jsonl")
-    output_dir = Path("data/index")
+    index_dir = Path("data/index/chroma")
     if not input_path.exists():
         print(f"Input file {input_path} not found")
         return
-    output_dir.mkdir(parents=True, exist_ok=True)
+    index_dir.mkdir(parents=True, exist_ok=True)
+
     texts: List[str] = []
-    meta: List[dict] = []
+    ids: List[str] = []
+    labels: List[str] = []
     with input_path.open("r", encoding="utf-8") as infile:
         for line in infile:
             record = json.loads(line)
             texts.append(record.get("text", ""))
-            meta.append({"id": record.get("id"), "label": record.get("label")})
+            ids.append(str(record.get("id")))
+            labels.append(record.get("label"))
+
     try:
         client = OpenAI()
     except Exception:
         client = None
     vectors = embed_texts(texts, client)
-    np.save(output_dir / "embeddings.npy", np.array(vectors))
-    with (output_dir / "meta.jsonl").open("w", encoding="utf-8") as outfile:
-        for m in meta:
-            outfile.write(json.dumps(m) + "\n")
-    print(f"Stored {len(vectors)} embeddings in {output_dir}")
+
+    chroma_client = chromadb.PersistentClient(path=str(index_dir))
+    collection = chroma_client.get_or_create_collection("chunks")
+    metadatas = [
+        {"id": i, "label": l, "text": t}
+        for i, l, t in zip(ids, labels, texts)
+    ]
+    collection.upsert(ids=ids, embeddings=vectors, documents=texts, metadatas=metadatas)
+
+    print(f"Upserted {len(vectors)} embeddings into Chroma at {index_dir}")
 
 if __name__ == "__main__":
     main()
