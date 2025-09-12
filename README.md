@@ -13,7 +13,7 @@ LLMO는 GitHub 저장소의 웹/앱 소스를 수집하여 RAG(Retrieval-Augment
 ## 특징
 - GitHub 또는 실제 웹 페이지에서 HTML 소스를 수집
 - 페이지 블록을 LLM/휴리스틱으로 분류
-- 분류된 블록에서 특징을 추출하고 청크 단위로 묶음
+- 분류된 블록에서 LLM/휴리스틱으로 특징을 추출하고 청크 단위로 묶음
 - 임베딩을 생성하여 FAISS 인덱스를 구축
 - 임베딩 기반 검색 API 제공
 
@@ -28,7 +28,7 @@ echo "OPENAI_API_KEY=YOUR_KEY" > .env
 ## 환경 변수
 실행 시 다음 환경 변수를 사용할 수 있습니다.
 - `OPENAI_API_KEY` : OpenAI API 키(설정하지 않으면 해시 기반 임베딩 사용)
-- `CHAT_MODEL` : 페이지 분류에 사용할 모델 이름(기본값 `gpt-4o-mini`)
+- `CHAT_MODEL` : 페이지 분류와 특징 추출에 사용할 모델 이름(기본값 `gpt-4o-mini`)
 - `EMBEDDING_MODEL` : 임베딩 생성에 사용할 모델 이름(기본값 `text-embedding-3-small`)
 - `PORT` : API 서버 포트(기본값 `8000`)
 
