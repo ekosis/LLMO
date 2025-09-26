@@ -152,6 +152,21 @@ class SearchResponse(BaseModel):
 # ----------------------
 # Embeddings (with LRU cache + fallback)
 # ----------------------
+def _fallback_dimension() -> int:
+    raw = os.getenv("FALLBACK_EMBED_DIM")
+    try:
+        return int(raw) if raw else 1536
+    except (TypeError, ValueError):
+        return 1536
+
+
+def _fallback_embed(text: str, size: int) -> Tuple[float, ...]:
+    digest = hashlib.sha256(text.encode("utf-8")).digest()
+    repeats = size // len(digest) + 1
+    extended = (digest * repeats)[:size]
+    return tuple(b / 255 for b in extended)
+
+
 @lru_cache(maxsize=10_000)
 def _embed_cached(text: str, model: str) -> Tuple[float, ...]:
     try:
@@ -159,11 +174,7 @@ def _embed_cached(text: str, model: str) -> Tuple[float, ...]:
         resp = client.embeddings.create(model=model, input=[text])
         return tuple(resp.data[0].embedding)
     except Exception:
-        digest = hashlib.sha256(text.encode("utf-8")).digest()
-        size = 512
-        repeats = size // len(digest) + 1
-        extended = (digest * repeats)[:size]
-        return tuple(b / 255 for b in extended)
+        return _fallback_embed(text, _fallback_dimension())
 
 def embed(text: str) -> List[float]:
     return list(_embed_cached(text, EMBEDDING_MODEL))
