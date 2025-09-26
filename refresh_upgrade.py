@@ -232,14 +232,24 @@ def chunk_features(records: List[Dict[str, Any]], file_id: str,
 # ----------------------------
 # Step 6: embeddings (fallback if OpenAI unavailable)
 # ----------------------------
+def _fallback_dimension() -> int:
+    raw = os.getenv("FALLBACK_EMBED_DIM")
+    try:
+        return int(raw) if raw else 1536
+    except (TypeError, ValueError):
+        return 1536
+
+
+def _fallback_embed(text: str, size: int) -> List[float]:
+    digest = hashlib.sha256(text.encode("utf-8")).digest()
+    repeats = size // len(digest) + 1
+    return [b / 255 for b in (digest * repeats)[:size]]
+
+
 def embed_texts(texts: List[str], client: Optional[OpenAI]) -> List[List[float]]:
     if client is None:
-        # deterministic fallback
-        vecs: List[List[float]] = []
-        for t in texts:
-            dig = hashlib.sha256(t.encode("utf-8")).digest()
-            vecs.append([b / 255 for b in dig[:32]])
-        return vecs
+        size = _fallback_dimension()
+        return [_fallback_embed(t, size) for t in texts]
     resp = client.embeddings.create(model=EMBEDDING_MODEL, input=texts)
     return [d.embedding for d in resp.data]
 

@@ -10,17 +10,27 @@ import chromadb
 from openai import OpenAI
 
 
+def _fallback_dimension() -> int:
+    raw = os.getenv("FALLBACK_EMBED_DIM")
+    try:
+        return int(raw) if raw else 1536
+    except (TypeError, ValueError):
+        return 1536
+
+
+def _fallback_embed(text: str, size: int) -> List[float]:
+    digest = hashlib.sha256(text.encode("utf-8")).digest()
+    repeats = size // len(digest) + 1
+    return [b / 255 for b in (digest * repeats)[:size]]
+
+
 def embed_texts(texts: List[str], client: OpenAI | None) -> List[List[float]]:
     """
     Batch-embed texts with OpenAI; fall back to deterministic hash vectors if API unavailable.
     """
     if client is None:
-        vectors = []
-        for text in texts:
-            digest = hashlib.sha256(text.encode("utf-8")).digest()
-            vec = [b / 255 for b in digest[:32]]
-            vectors.append(vec)
-        return vectors
+        size = _fallback_dimension()
+        return [_fallback_embed(text, size) for text in texts]
     model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
     resp = client.embeddings.create(model=model, input=texts)
     return [d.embedding for d in resp.data]
